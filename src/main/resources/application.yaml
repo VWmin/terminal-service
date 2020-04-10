@@ -1,0 +1,5 @@
+server:
+  port: 5800
+
+bot:
+  cq-http-url: http://localhost:5700
