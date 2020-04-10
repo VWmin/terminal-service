@@ -9,6 +9,7 @@
 1. 你刚好有一个装上了[CQHTTP](https://cqhttp.cc/)插件的[Coolq](https://cqp.cc/)机器人
 2. 创建一个SpringBoot web工程
 3. 引入本项目依赖(目前只能clone源码，再maven install到本地使用)
+4. 添加配置项`bot.cq-http-url`，默认值是`http://localhost:5700`
 
 ### 开始
 
@@ -17,7 +18,7 @@
 ```java
 @CommandLine.Command
 public class SomeCommand{
-	...
+	// 一些命令参数...
 }
 ```
 
@@ -32,7 +33,7 @@ public class SomeCommandController implements Reply {
     @Override
     public ReplyEntity call(PostEntity postEntity) { // Coolq上报的消息作为参数传进来
         // 实现这个接口时，返回的内容将会作为快速回复发送出去
-        ...
+        // do something with your command...
     }
 }
 ```
@@ -46,7 +47,7 @@ public class SomeCommandController implements Send {
     @Override
     public void call(CQClientApi cqClientApi, PostEntity postEntity) {
        // 实现这个接口时，可使用传入的api进行发送消息等操作
-        ...
+       // // do something with your command...
     }
 }
 ```
@@ -62,7 +63,7 @@ public class SomeCommandController implements Send {
 public class SayCommand {
 
     @CommandLine.Parameters(index = "0")
-    private String saySomething;
+    private String saySomething; // 位于say后面的第一个单词，如say hello中就是hello
 
     public String getSaySomething() {
         return saySomething;
