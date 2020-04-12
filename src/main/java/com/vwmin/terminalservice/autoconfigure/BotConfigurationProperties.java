@@ -14,4 +14,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "bot")
 public class BotConfigurationProperties {
     private String cqHttpUrl;
+    private String cqHome;
 }

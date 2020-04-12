@@ -40,4 +40,10 @@ class Utils {
             throw methodError(method, message, args);
         }
     }
+
+    static void notEmpty(CharSequence cs, String message){
+        if (cs == null || cs.length() == 0){
+            throw new IllegalArgumentException(message);
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.vwmin.terminalservice;
 
 import com.vwmin.terminalservice.entity.MessageSegment;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * @date 2020/4/9 12:12
  */
 public class MessageSegmentBuilder {
-    private List<MessageSegment> segments;
+    private final List<MessageSegment> segments;
 
     public MessageSegmentBuilder(){
         this.segments = new ArrayList<>();
@@ -22,7 +23,7 @@ public class MessageSegmentBuilder {
      * @param text 要发送的文本
      * @return builder实例自身
      */
-    public MessageSegmentBuilder addTextSegment(String text){
+    public MessageSegmentBuilder plainText(String text){
         MessageSegment segment = new MessageSegment();
         segment.setType("text");
         segment.addData("text", text);
@@ -35,7 +36,7 @@ public class MessageSegmentBuilder {
      * @param userId QQ号
      * @return 实例自身
      */
-    public MessageSegmentBuilder addAtSegment(Long userId){
+    public MessageSegmentBuilder at(Long userId){
         MessageSegment segment = new MessageSegment();
         segment.setType("at");
         segment.addData("qq", userId);
@@ -44,6 +45,40 @@ public class MessageSegmentBuilder {
 
         return this;
     }
+
+    /**
+     * at 全体成员
+     * @return 实例自身
+     */
+    public MessageSegmentBuilder atAll(){
+        MessageSegment segment = new MessageSegment();
+        segment.setType("at");
+        segment.addData("qq", "all");
+
+        segments.add(segment);
+
+        return this;
+    }
+
+
+    public MessageSegmentBuilder image(String file, String url){
+        MessageSegment segment = new MessageSegment();
+        segment.setType("image");
+        segment.addData("file", file);
+
+        try{
+            if (!ImageUtils.isExist(file)){
+                ImageUtils.downloadImage(file, url);
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+            return this;
+        }
+
+        segments.add(segment);
+        return this;
+    }
+
 
     public List<MessageSegment> build(){
         return segments;

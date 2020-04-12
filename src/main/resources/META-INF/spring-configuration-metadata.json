@@ -1,0 +1,24 @@
+{
+  "groups": [
+    {
+      "name": "bot",
+      "type": "com.vwmin.terminalservice.autoconfigure.BotConfigurationProperties",
+      "sourceType": "com.vwmin.terminalservice.autoconfigure.BotConfigurationProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "bot.cq-home",
+      "type": "java.lang.String",
+      "sourceType": "com.vwmin.terminalservice.autoconfigure.BotConfigurationProperties",
+      "description": "酷Q安装目录"
+    },
+    {
+      "name": "bot.cq-http-url",
+      "type": "java.lang.String",
+      "sourceType": "com.vwmin.terminalservice.autoconfigure.BotConfigurationProperties",
+      "description": "CQHTTP api"
+    }
+  ],
+  "hints": []
+}

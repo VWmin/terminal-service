@@ -2,6 +2,7 @@ package com.vwmin.terminalservice.autoconfigure;
 
 import com.vwmin.restproxy.RestProxy;
 import com.vwmin.terminalservice.CQClientApi;
+import com.vwmin.terminalservice.ImageUtils;
 import com.vwmin.terminalservice.PostController;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -22,6 +23,12 @@ public class BotAutoConfiguration {
 
     public BotAutoConfiguration(BotConfigurationProperties properties){
         this.properties = properties;
+
+        String cqHome = properties.getCqHome();
+        if (cqHome == null || cqHome.length() == 0){
+            throw new IllegalArgumentException("请务必完成配置`bot.cqHome`（酷Q的安装目录）");
+        }
+        ImageUtils.setImageHome(cqHome+"\\data\\image\\");
     }
 
     @Bean
