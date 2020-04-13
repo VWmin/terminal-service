@@ -4,10 +4,8 @@ import com.vwmin.terminalservice.entity.PostEntity;
 import com.vwmin.terminalservice.entity.ReplyEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,9 +15,12 @@ import javax.annotation.PostConstruct;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -36,17 +37,31 @@ public class PostController {
     private final
     CQClientApi cqClientApi;
 
-    private Map<String, Object> commandCache;
+    private final
+    Map<String, Object> commandCache;
+
+    private final
+    List<CommandInterceptor> interceptors;
 
     public PostController(ApplicationContext applicationContext, CQClientApi cqClientApi) {
         this.applicationContext = applicationContext;
         this.commandCache = new ConcurrentHashMap<>(4);
         this.cqClientApi = cqClientApi;
+        this.interceptors = new ArrayList<>();
     }
 
     @PostMapping("")
-    public ResponseEntity<?> handRequest(@RequestBody PostEntity entity) {
-        String[] args = entity.getMessage().split("\\s+");
+    public ResponseEntity<?> handRequest(@RequestBody PostEntity post) {
+        //处理拦截
+        AtomicReference<String> raw = new AtomicReference<>(post.getMessage());
+        interceptors.forEach(interceptor->{
+            if (interceptor.isMatch(post)){
+                raw.set(interceptor.handle(post.getMessage()));
+            }
+        });
+
+        //分割命令
+        String[] args = raw.get().split("\\s+");
         log.info("args >>> " + Arrays.toString(args));
         Object commandController = commandCache.get(args[0]);
         if (commandController == null){
@@ -110,13 +125,13 @@ public class PostController {
         // 开始执行命令
         try{
             if (commandController instanceof Send){
-                ((Send) commandController).call(cqClientApi, entity);
+                ((Send) commandController).call(cqClientApi, post);
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }else if (commandController instanceof Reply){
-                return new ResponseEntity<>(((Reply) commandController).call(entity), HttpStatus.OK);
+                return new ResponseEntity<>(((Reply) commandController).call(post), HttpStatus.OK);
             }
         } catch (Exception e){
-            ReplyEntity replyEntity = quickErrorResponse(entity.getUser_id(), e.getMessage());
+            ReplyEntity replyEntity = quickErrorResponse(post.getUser_id(), e.getMessage());
             return new ResponseEntity<>(replyEntity, HttpStatus.OK);
         }
 
@@ -143,6 +158,8 @@ public class PostController {
             commandCache.put(bind2, bean);
         });
 
+        Map<String, CommandInterceptor> autoInterceptors = applicationContext.getBeansOfType(CommandInterceptor.class);
+        interceptors.addAll(autoInterceptors.values());
     }
 
 

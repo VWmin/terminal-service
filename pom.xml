@@ -6,7 +6,7 @@
 
     <groupId>com.vwmin</groupId>
     <artifactId>terminal-service</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <description>轻松创建处理命令的coolq bot.</description>
 
     <properties>

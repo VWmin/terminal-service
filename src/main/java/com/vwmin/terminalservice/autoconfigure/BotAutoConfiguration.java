@@ -28,7 +28,7 @@ public class BotAutoConfiguration {
         if (cqHome == null || cqHome.length() == 0){
             throw new IllegalArgumentException("请务必完成配置`bot.cqHome`（酷Q的安装目录）");
         }
-        ImageUtils.setImageHome(cqHome+"\\data\\image\\");
+        ImageUtils.setImageHome(cqHome+"/data/image/");
     }
 
     @Bean
